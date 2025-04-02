@@ -1,0 +1,19 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tfintech
+    username: tfintech
+    password: pass
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: classpath:/db/changelog/changelog.xml
+api:
+  url:
+    categories: https://kudago.com/public-api/v1.4/place-categories
+    locations: https://kudago.com/public-api/v1.4/locations
+application:
+  security:
+    jwt:
+      secret-key: 0acd75bff511d12aaa9dd1e663b62f3fe61da31410d082f24f430d9afe83607a
+      ttl: 600000
