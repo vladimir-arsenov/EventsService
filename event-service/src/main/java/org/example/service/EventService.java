@@ -2,73 +2,58 @@ package org.example.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.client.ApiClient;
 import org.example.model.Event;
-import org.example.model.Location;
-import org.example.repository.EventRepository;
-import org.springframework.data.jpa.domain.Specification;
+import org.example.repository.CategoryRepository;
+import org.example.repository.LocationRepository;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class EventService {
 
-    private final EventRepository eventRepository;
-    private final LocationService locationService;
+    private final ApiClient apiClient;
+    private final CategoryRepository categoryRepository;
+    private final LocationRepository locationRepository;
 
-    public List<Event> getAll(String name, Long location, LocalDate fromDate, LocalDate toDate) {
-        return eventRepository.findAll(eventSpecification(name, location, fromDate, toDate))
-                .stream()
-                .toList();
-    }
+    @Async
+    public CompletableFuture<List<Event>> getEvents(BigDecimal budget, String currency, LocalDate dateFrom,
+                                                    LocalDate dateTo, String category, String location) {
+        categoryRepository.findBySlug(category).orElseThrow(
+                () -> new EntityNotFoundException("Category with slug %s not found".formatted(category)));
 
-    public Event get(Long id) {
-        return eventRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event with id " + id + " not found"));
-    }
+        categoryRepository.findBySlug(category).orElseThrow(
+                () -> new EntityNotFoundException("Category with slug %s not found".formatted(category)));
 
-    public void add(Event event) {
-        eventRepository.save(event);
+        List<Event> result = new ArrayList<>();
 
-        Location location = event.getLocation();
-        location.getEvents().add(event);
-        locationService.update(location.getId(), location);
-    }
+        CompletableFuture<Void> allDone = CompletableFuture
+                .supplyAsync(() -> apiClient.getEvents(dateFrom, dateTo, category, location))
+                .exceptionally(ex -> {
+                    log.error("Error while getting events: {}", ex.getMessage());
+                    return new Event[0];
+                })
+                .thenAcceptBoth(CompletableFuture
+                                .supplyAsync(() -> apiClient.convertMoney(budget, currency))
+                                .exceptionally(ex -> {
+                                    log.error("Error while converting money: {}", ex.getMessage());
+                                    return BigDecimal.ZERO;
+                                }),
+                        (events, convertedBudget) -> result.addAll(Arrays.stream(events)
+                                .filter(event -> event.getPrice().compareTo(convertedBudget) <= 0)
+                                .toList())
+                );
 
-    public void update(Long id, Event event) {
-        var e = get(id);
-        e.setDate(event.getDate());
-        e.setName(event.getName());
-        e.setLocation(event.getLocation());
-
-        eventRepository.save(e);
-    }
-
-    public void delete(Long id) {
-        eventRepository.delete(get(id));
-    }
-
-    private Specification<Event> eventSpecification(String name, Long location, LocalDate fromDate, LocalDate toDate) {
-        List<Specification<Event>> specs = new ArrayList<>();
-        if (name != null) {
-            specs.add((event, query, cb) -> cb.equal(event.get("name"), name));
-        }
-
-        if (location != null) {
-            specs.add((event, query, cb) -> cb.equal(event.get("location").get("id"), location));
-        }
-
-        if (fromDate != null && toDate != null) {
-            specs.add((event, query, cb) -> cb.between(event.get("date"), fromDate, toDate));
-        } else if (fromDate != null) {
-            specs.add((event, query, cb) -> cb.greaterThanOrEqualTo(event.get("date"), fromDate));
-        } else if (toDate != null) {
-            specs.add((event, query, cb) -> cb.lessThanOrEqualTo(event.get("date"), toDate));
-        }
-
-        return specs.stream().reduce(Specification::and).orElse(null);
+        return allDone.thenApply(v -> new ArrayList<>(result));
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.dto.EventDto;
 import org.example.model.Event;
 import org.example.model.Location;
-import org.example.repository.EventRepository;
 import org.example.repository.LocationRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

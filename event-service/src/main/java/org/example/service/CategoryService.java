@@ -1,40 +1,30 @@
 package org.example.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.example.model.Category;
-import org.example.repository.ConcurrentHashMapRepository;
+import org.example.dto.CategoryDto;
+import org.example.mapper.CategoryMapper;
+import org.example.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class CategoryService {
 
-    private final ConcurrentHashMapRepository<Integer, Category> repository;
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
-    public Category getCategory(Integer id) {
-        return Optional.ofNullable(repository.get(id))
-                .orElseThrow(() -> new NoSuchElementException("Category with id %d not found".formatted(id)));
+    public List<CategoryDto> getAll() {
+        return categoryRepository.findAll().stream()
+                .map(categoryMapper::toDto)
+                .toList();
     }
 
-    public void addCategory(Category category) {
-        repository.add(category);
+    public CategoryDto get(Long id) {
+        return categoryMapper.toDto(categoryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found")));
     }
 
-    public List<Category> getAllCategories() {
-        return repository.getAll();
-    }
-
-    public void updateCategory(Category newCategory) {
-        Optional.ofNullable(repository.update(newCategory))
-                .orElseThrow(() -> new NoSuchElementException("Category with id %d not found".formatted(newCategory.getId())));
-    }
-
-    public void deleteCategory(Integer id) {
-        Optional.ofNullable(repository.delete(id))
-                .orElseThrow(() -> new NoSuchElementException("Category with id %d not found".formatted(id)));
-    }
 }
