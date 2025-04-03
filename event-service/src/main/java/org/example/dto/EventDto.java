@@ -1,22 +1,21 @@
 package org.example.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Data
 public class EventDto {
+    private final int id;
+    private final String title;
+    private final BigDecimal price;
 
-    private final Long id;
-
-    @NotBlank(message = "name cannot be blank")
-    private final String name;
-
-    @NotNull(message = "date cannot be null")
-    private final LocalDate date;
-
-    @NotNull(message = "locationId cannot be null")
-    private final Long locationId;
+    public EventDto(int id, String title, String price) {
+        this.id = id;
+        this.title = title;
+        Matcher matcher = Pattern.compile("\\d+").matcher(price);
+        this.price = new BigDecimal(matcher.find() ? matcher.group() : "0");
+    }
 }

@@ -1,0 +1,6 @@
+CREATE TABLE categories
+(
+    id   BIGSERIAL PRIMARY KEY,
+    slug VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL
+);

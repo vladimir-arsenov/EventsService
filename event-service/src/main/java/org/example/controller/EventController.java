@@ -1,62 +1,49 @@
 package org.example.controller;
 
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.dto.EventDto;
-import org.example.mapper.EventMapper;
 import org.example.service.EventService;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+
+@Tag(name = "Events", description = "Controller for working with events")
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/v1/events")
-@Validated
 public class EventController {
 
     private final EventService eventService;
-    private final EventMapper eventMapper;
 
+    @Operation(summary = "Get a list of events", description = "Retrieve events based on provided parameters")
     @GetMapping
     public List<EventDto> getEvents(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Long location,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
+            @Parameter(description = "Budget amount", example = "47.50") @RequestParam BigDecimal budget,
+            @Parameter(description = "Currency", example = "USD") @RequestParam String currency,
+            @Parameter(description = "Start date", example = "2023-01-01") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @Parameter(description = "End date", example = "2024-01-01")@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @Parameter(description = "Category", example = "Танцы") @RequestParam(required = false) String category,
+            @Parameter(description = "Location", example = "msk") @RequestParam(required = false) String location
     ) {
-        return eventService.getAll(name, location, fromDate, toDate)
-                .stream().map(eventMapper::toDto).toList();
-    }
-
-    @GetMapping("/{id}")
-    public EventDto getEvent(@PathVariable Long id) {
-        return eventMapper.toDto(eventService.get(id));
-    }
-
-    @PostMapping
-    public void addEvent(@Valid @RequestBody EventDto event) {
-        eventService.add(eventMapper.toModel(event));
-    }
-
-    @PutMapping("/{id}")
-    public void updateEvent(@PathVariable Long id, @Valid @RequestBody EventDto event) {
-        eventService.update(id, eventMapper.toModel(event));
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteEvent(@PathVariable Long id) {
-        eventService.delete(id);
+        try {
+            return eventService.getEvents(budget, currency, dateFrom, dateTo, category, location).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.warn("Error getting events");
+            throw new RuntimeException(e);
+        }
     }
 }
+

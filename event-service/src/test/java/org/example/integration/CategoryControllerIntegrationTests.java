@@ -18,15 +18,12 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.integrations.testcontainers.WireMockContainer;
 
-import java.util.NoSuchElementException;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
@@ -58,8 +55,8 @@ public class CategoryControllerIntegrationTests {
     @BeforeEach
     public void setUp() throws JsonProcessingException {
 
-        Category[] categories = { new Category(1, "", " "), new Category(2, "", " "),
-                new Category(3, "", " "), new Category(4, "", " ")};
+        Category[] categories = { new Category(1L, "slug1", " "), new Category(2L, "", " "),
+                new Category(3L, "", " "), new Category(4L, "", " ")};
         String json = objectMapper.writeValueAsString(categories);
         stubFor(
                 WireMock.get(urlEqualTo("/public-api/v1.4/place-categories"))
@@ -73,42 +70,16 @@ public class CategoryControllerIntegrationTests {
     }
 
     @Test
-    public void shouldReturnCategories() throws JsonProcessingException {
-        var result = categoryController.getCategories();
+    public void getAll_shouldReturnCategories() {
+        var result = categoryController.getAll();
 
         assertFalse(result.isEmpty());
     }
 
     @Test
-    public void shouldGetCategory(){
-        var category = categoryController.getCategory(1);
+    public void get_shouldReturnCategory(){
+        var category = categoryController.get(1L);
 
-        assertEquals(1, category.getId());
-    }
-
-    @Test
-    public void shouldAddCategory() {
-        var newCategory = new Category(5, "", " ");
-        categoryController.addCategory(newCategory);
-
-        var result = categoryController.getCategory(5);
-
-        assertEquals(newCategory, result);
-    }
-
-    @Test
-    public void shouldUpdateCategory() {
-        categoryController.updateCategory(new Category(5, "", "updated"));
-
-        var result = categoryController.getCategory(5);
-
-        assertEquals("updated", result.getName());
-    }
-
-    @Test
-    public void shouldDeleteCategory() {
-        categoryController.deleteCategory(5);
-
-        assertThrows(NoSuchElementException.class, () -> categoryController.getCategory(5));
+        assertEquals("slug1", category.getSlug());
     }
 }
