@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  event-service:
+    build:
+      context: .
+      dockerfile: event-service/Dockerfile
+    container_name: event-service
+    environment:
+      EVENT_SERVICE_PORT: ${EVENT_SERVICE_PORT}
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${EVENT_SERVICE_PORT}:${EVENT_SERVICE_PORT}"
+    depends_on:
+      - postgres
+
+  currency-service:
+    build:
+      context: .
+      dockerfile: currency-service/Dockerfile
+    container_name: currency-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "${CURRENCY_SERVICE_PORT}:${CURRENCY_SERVICE_PORT}"
+
+  elasticsearch:
+    image: elasticsearch:8.16.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    networks:
+      - elk
+
+  logstash:
+    image: logstash:8.16.1
+    container_name: logstash
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5044:5044"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:8.16.1
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+networks:
+  elk:
+
+volumes:
+  postgres_data:
