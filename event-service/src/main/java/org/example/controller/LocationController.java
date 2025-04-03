@@ -1,7 +1,7 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.dto.LocationDto;
+import org.example.dto.LocationResponseDto;
 import org.example.service.LocationService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,12 +21,12 @@ public class LocationController {
 
 
     @GetMapping("")
-    public List<LocationDto> getAll() {
+    public List<LocationResponseDto> getAll() {
         return locationService.getAll();
     }
 
     @GetMapping("/{id}")
-    public LocationDto get(@PathVariable Long id) {
+    public LocationResponseDto get(@PathVariable Long id) {
         return locationService.get(id);
     }
 }

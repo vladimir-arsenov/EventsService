@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.model.Event;
+import org.example.dto.EventDto;
 import org.example.service.EventService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +30,7 @@ public class EventController {
 
     @Operation(summary = "Get a list of events", description = "Retrieve events based on provided parameters")
     @GetMapping
-    public List<Event> getEvents(
+    public List<EventDto> getEvents(
             @Parameter(description = "Budget amount", example = "47.50") @RequestParam BigDecimal budget,
             @Parameter(description = "Currency", example = "USD") @RequestParam String currency,
             @Parameter(description = "Start date", example = "2023-01-01") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,

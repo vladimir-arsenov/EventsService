@@ -2,7 +2,6 @@ package org.example.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.dto.EventDto;
-import org.example.model.Event;
 import org.example.model.Location;
 import org.example.repository.LocationRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
-public class EventControllerIntegrationTest {
+public class EventDtoControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -96,7 +95,7 @@ public class EventControllerIntegrationTest {
     void getEvent_shouldReturnEventFromRepository() throws Exception {
         var location = new Location(1L, "test", "Test Location", Collections.emptyList());
         var savedLocation = locationRepository.save(location);
-        var event = new Event();
+        var event = new EventDto();
         event.setName("Existing Event");
         event.setDate(LocalDate.now());
         event.setLocation(savedLocation);
@@ -112,7 +111,7 @@ public class EventControllerIntegrationTest {
     void updateEvent_shouldUpdateEventInRepository() throws Exception {
         var location = new Location(1L, "test", "Test Location", Collections.emptyList());
         var savedLocation = locationRepository.save(location);
-        var event = new Event();
+        var event = new EventDto();
         event.setName("Original Event");
         event.setDate(LocalDate.now());
         event.setLocation(savedLocation);
@@ -133,7 +132,7 @@ public class EventControllerIntegrationTest {
     void deleteEvent_shouldDeleteEventFromRepository() throws Exception {
         var location = new Location(1L, "test", "Test Location", Collections.emptyList());
         var savedLocation = locationRepository.save(location);
-        var event = new Event();
+        var event = new EventDto();
         event.setName("Event to Delete");
         event.setDate(LocalDate.now());
         event.setLocation(savedLocation);
@@ -150,12 +149,12 @@ public class EventControllerIntegrationTest {
     void getAllEvents_shouldGetAllEventFromRepository() throws Exception {
         var location = new Location(1L, "test", "Test Location", Collections.emptyList());
         var savedLocation = locationRepository.save(location);
-        var event1 = new Event();
+        var event1 = new EventDto();
         event1.setName("Event 1");
         event1.setDate(LocalDate.now());
         event1.setLocation(savedLocation);
         eventRepository.save(event1);
-        var event2 = new Event();
+        var event2 = new EventDto();
         event2.setName("Event 2");
         event2.setDate(LocalDate.now().plusDays(1));
         event2.setLocation(savedLocation);

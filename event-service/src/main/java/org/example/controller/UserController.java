@@ -1,7 +1,7 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.dto.ChangePasswordRequest;
+import org.example.dto.ChangePasswordRequestDto;
 import org.example.service.UserService;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +18,7 @@ public class UserController {
     private final UserService service;
 
     @PatchMapping("/change-password")
-    public void changePassword(@RequestBody ChangePasswordRequest request, Principal connectedUser) {
+    public void changePassword(@RequestBody ChangePasswordRequestDto request, Principal connectedUser) {
         service.changePassword(request, connectedUser);
     }
 }

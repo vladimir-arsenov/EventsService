@@ -1,7 +1,7 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.dto.CategoryDto;
+import org.example.dto.CategoryResponseDto;
 import org.example.executiontimeloggerstarter.LogExecutionTime;
 import org.example.service.CategoryService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,12 +20,12 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryDto> getAll() {
+    public List<CategoryResponseDto> getAll() {
         return categoryService.getAll();
     }
 
     @GetMapping("/{id}")
-    public CategoryDto get(@PathVariable Long id) {
+    public CategoryResponseDto get(@PathVariable Long id) {
         return categoryService.get(id);
     }
 }

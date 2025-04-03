@@ -2,9 +2,9 @@ package org.example.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.dto.EventResponse;
+import org.example.dto.EventResponseDto;
 import org.example.model.Category;
-import org.example.model.Event;
+import org.example.dto.EventDto;
 import org.example.model.Location;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -39,7 +39,7 @@ public class ApiClient {
     @Value("${api.url.locations}")
     private String locationsUrl;
 
-    public Event[] getEvents(LocalDate dateFrom, LocalDate dateTo, String category, String location) {
+    public EventDto[] getEvents(LocalDate dateFrom, LocalDate dateTo, String category, String location) {
         log.info("Calling API to acquire events...");
         try {
             var url = eventsUrl
@@ -47,14 +47,14 @@ public class ApiClient {
                     + (dateTo == null ? "" : "&actual_until=" + dateTo)
                     + (category == null ? "" : "&category=" + category)
                     + (location == null ? "" : "&location=" + location);
-            ResponseEntity<EventResponse> response = restTemplate.getForEntity(url, EventResponse.class);
+            ResponseEntity<EventResponseDto> response = restTemplate.getForEntity(url, EventResponseDto.class);
             log.info("Events acquired");
 
             return response.getBody().getResults();
         } catch (RestClientException e) {
             log.error("Couldn't fetch events: {}", e.getMessage());
 
-            return new Event[0];
+            return new EventDto[0];
         }
     }
 

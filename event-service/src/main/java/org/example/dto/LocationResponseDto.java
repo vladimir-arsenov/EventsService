@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CategoryDto {
+public class LocationResponseDto {
     private final String slug;
     private final String name;
 }

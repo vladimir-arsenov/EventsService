@@ -1,7 +1,7 @@
 package org.example.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.dto.LocationDto;
+import org.example.dto.LocationResponseDto;
 import org.example.model.Location;
 import org.example.repository.LocationRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -74,7 +74,7 @@ public class LocationControllerIntegrationTest {
 
     @Test
     void addLocation_shouldAddLocationToRepository() throws Exception {
-        LocationDto locationDto = new LocationDto(null, "new-location", "New Location", Collections.emptyList());
+        LocationResponseDto locationDto = new LocationResponseDto(null, "new-location", "New Location", Collections.emptyList());
 
         mockMvc.perform(post("/api/v1/locations")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -89,7 +89,7 @@ public class LocationControllerIntegrationTest {
 
     @Test
     void addLocation_invalidRequest_shouldReturnBadRequest() throws Exception {
-        LocationDto locationDto = new LocationDto(null, "", "", Collections.emptyList());
+        LocationResponseDto locationDto = new LocationResponseDto(null, "", "", Collections.emptyList());
 
         mockMvc.perform(post("/api/v1/locations")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +103,7 @@ public class LocationControllerIntegrationTest {
         location.setName("Original Location");
         location.setSlug("original-location");
         when(locationRepository.findById(anyLong())).thenReturn(Optional.of(location));
-        LocationDto updatedLocationDto = new LocationDto(null, "updated-location", "Updated Location", Collections.emptyList());
+        LocationResponseDto updatedLocationDto = new LocationResponseDto(null, "updated-location", "Updated Location", Collections.emptyList());
 
         mockMvc.perform(put("/api/v1/locations/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +120,7 @@ public class LocationControllerIntegrationTest {
     void updateLocation_invalidRequest_shouldReturnBadRequest() throws Exception {
         when(locationRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        LocationDto updatedLocationDto = new LocationDto(null, "updated-location", "Updated Location", Collections.emptyList());
+        LocationResponseDto updatedLocationDto = new LocationResponseDto(null, "updated-location", "Updated Location", Collections.emptyList());
 
         mockMvc.perform(put("/api/v1/locations/1")
                         .contentType(MediaType.APPLICATION_JSON)
