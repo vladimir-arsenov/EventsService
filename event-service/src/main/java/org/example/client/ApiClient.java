@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,6 +84,7 @@ public class ApiClient {
             ResponseEntity<Category[]> response = restTemplate.getForEntity(categoriesUrl, Category[].class);
             log.info("Categories acquired");
 
+            System.out.println(Arrays.toString(response.getBody()));
             return response.getBody();
         } catch (RestClientException e) {
             log.error("Couldn't fetch categories: {}", e.getMessage());
@@ -99,6 +101,7 @@ public class ApiClient {
             ResponseEntity<Location[]> response = restTemplate.getForEntity(locationsUrl, Location[].class);
             log.info("Locations acquired");
 
+            System.out.println(Arrays.toString(response.getBody()));
             return response.getBody();
         } catch (RestClientException e) {
             log.error("Couldn't fetch locations: {}", e.getMessage());

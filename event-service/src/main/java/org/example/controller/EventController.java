@@ -34,10 +34,12 @@ public class EventController {
             @Parameter(description = "Budget amount", example = "47.50") @RequestParam BigDecimal budget,
             @Parameter(description = "Currency", example = "USD") @RequestParam String currency,
             @Parameter(description = "Start date", example = "2023-01-01") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
-            @Parameter(description = "End date", example = "2024-01-01")@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
+            @Parameter(description = "End date", example = "2024-01-01")@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @Parameter(description = "Category", example = "Танцы") @RequestParam(required = false) String category,
+            @Parameter(description = "Location", example = "msk") @RequestParam(required = false) String location
     ) {
         try {
-            return eventService.getEvents(budget, currency, dateFrom, dateTo).get();
+            return eventService.getEvents(budget, currency, dateFrom, dateTo, category, location).get();
         } catch (InterruptedException | ExecutionException e) {
             log.warn("Error getting events");
             throw new RuntimeException(e);

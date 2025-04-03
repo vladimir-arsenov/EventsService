@@ -1,26 +1,27 @@
 server:
-  port: 8081
+  port: ${EVENT_SERVICE_PORT}
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/tfintech
-    username: tfintech
-    password: pass
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
   liquibase:
     change-log: classpath:/db/changelog/changelog.xml
 api:
   url:
-    categories: https://kudago.com/public-api/v1.4/place-categories
+    categories: https://kudago.com/public-api/v1.4/event-categories
     locations: https://kudago.com/public-api/v1.4/locations
     events: https://kudago.com/public-api/v1.4/events/?fields=id,title,price,location,category
     currencies: http://localhost:8080/currencies/convert
 application:
   security:
     jwt:
-      secret-key: 0acd75bff511d12aaa9dd1e663b62f3fe61da31410d082f24f430d9afe83607a
+      secret-key: ${SECURITY_SECRET_KEY}
       ttl: 600000
   executors:
     scheduler:
       interval: 1h
-    executor:
-      threadsCount: 2

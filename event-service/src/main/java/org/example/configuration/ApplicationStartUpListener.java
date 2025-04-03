@@ -12,6 +12,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -52,7 +53,7 @@ public class ApplicationStartUpListener {
 
         Runnable categoryInitTask = () -> {
             log.info("Initializing category repository...");
-            categoryRepository.saveAll(List.of(apiClient.getCategories()));
+            categoryRepository.saveAll(Arrays.asList(apiClient.getCategories()));
             log.info("Category repository initialized");
         };
 
