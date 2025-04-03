@@ -1,8 +1,8 @@
 package org.example.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.security.authentication.dto.AuthenticationRequest;
-import org.example.security.authentication.dto.RegisterRequest;
+import org.example.security.dto.AuthRequestDto;
+import org.example.security.dto.RegisterRequestDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,7 +49,7 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void register_validInput_shouldReturnToken() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("test", "test", false);
+        RegisterRequestDto registerRequest = new RegisterRequestDto("test", "test");
         mockMvc.perform(post("/api/v1/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
@@ -59,8 +59,8 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void authenticate_registeredUser_shouldReturnOkStatus() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("test1", "test1", false);
-        AuthenticationRequest authenticationRequest = new AuthenticationRequest("test1", "test1", true);
+        RegisterRequestDto registerRequest = new RegisterRequestDto("test1", "test1");
+        AuthRequestDto authenticationRequest = new AuthRequestDto("test1", "test1", true);
         mockMvc.perform(post("/api/v1/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
@@ -85,8 +85,8 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void authenticate_nonExistingUser_shouldReturnForbiddenStatus() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("test2", "test2", false);
-        AuthenticationRequest authenticationRequest = new AuthenticationRequest("nonExisting", "test2", true);
+        RegisterRequestDto registerRequest = new RegisterRequestDto("test2", "test2");
+        AuthRequestDto authenticationRequest = new AuthRequestDto("nonExisting", "test2", true);
         mockMvc.perform(post("/api/v1/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
@@ -100,7 +100,7 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void logout_authenticatedUser_shouldInvalidateToken() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("test3", "test3", false);
+        RegisterRequestDto registerRequest = new RegisterRequestDto("test3", "test3");
         var response = mockMvc.perform(post("/api/v1/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
@@ -123,14 +123,14 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void changePassword_shouldChangePassword() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("test4", "test4", false);
+        RegisterRequestDto registerRequest = new RegisterRequestDto("test4", "test4");
         var json = """
                 {
                     "currentPassword" : "test4",
                     "newPassword" : "new",
                     "confirmationPassword" : "new"
                 }""";
-        AuthenticationRequest authenticationRequest = new AuthenticationRequest("test4", "new", true);
+        AuthRequestDto authenticationRequest = new AuthRequestDto("test4", "new", true);
 
         var response = mockMvc.perform(post("/api/v1/register")
                         .contentType(MediaType.APPLICATION_JSON)

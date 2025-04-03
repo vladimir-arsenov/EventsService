@@ -24,6 +24,6 @@ public class LocationService {
 
     public LocationResponseDto get(Long id) {
         return locationMapper.toDto(locationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Location with id " + id + " not found")));
+                .orElseThrow(() -> new EntityNotFoundException("Location with id %d not found".formatted(id))));
     }
 }

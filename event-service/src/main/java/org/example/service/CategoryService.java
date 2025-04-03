@@ -24,7 +24,7 @@ public class CategoryService {
 
     public CategoryResponseDto get(Long id) {
         return categoryMapper.toDto(categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found")));
+                .orElseThrow(() -> new EntityNotFoundException("Category with id %d not found".formatted(id))));
     }
 
 }
